@@ -1,16 +1,30 @@
 package com.example.umc10th.domain.member.dto;
 
-import lombok.Getter;
+import com.example.umc10th.domain.member.enums.Gender;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public class MemberReqDTO {
 
-    // Request Body 예시
-    public record RequestBody(String stringTest, Long longTest){}
+    public record SignUp(
+            String name,
+            Gender gender,
+            LocalDate birth,
+            String address,
+            String email,
+            String password,
+            String phone,
+            List<String> preferFoodIds,
+            Agreements agreements
 
-    // public static class
-    @Getter
-    public static class RequestBodyClass{
-        private String stringTest;
-        private Long longTest;
-    }
+    ){}
+
+    public record Agreements(
+            Boolean ageAgree,
+            Boolean serviceAgree,
+            Boolean personalAgree,
+            Boolean locationAgree,
+            Boolean marketingAgree
+    ){}
 }
