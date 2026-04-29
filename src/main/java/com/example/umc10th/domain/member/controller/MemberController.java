@@ -43,4 +43,15 @@ public class MemberController {
     public String header(@RequestHeader("test") String test){
         return memberService.singleParameter(test);
     }
+
+    // DB에 test 유저 생성
+    @PostMapping("/user")
+    public String createUser(){
+        return memberService.createUser();
+    }
+
+    @DeleteMapping("/user")
+    public String deleteUser(){
+        return memberService.deleteUser();
+    }
 }
