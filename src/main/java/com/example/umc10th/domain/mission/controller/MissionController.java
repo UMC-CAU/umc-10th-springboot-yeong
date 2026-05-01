@@ -18,7 +18,7 @@ public class MissionController {
     // 미션 조회
     @GetMapping("/missions")
     public ApiResponse<MissionResDTO.MemberMissionListDTO> missions(
-            @RequestParam Success status
+            @RequestParam String status
             ){
         return ApiResponse.onSuccess(MissionSuccessCode.MEMBER_MISSION_LIST_SUCCESS, MissionConverter.toMemberMissionListDTO(status));
     }

@@ -9,7 +9,7 @@ import java.util.List;
 public class MissionConverter {
 
     // 미션 조회
-    public static MissionResDTO.MemberMissionListDTO toMemberMissionListDTO(Success status) {
+    public static MissionResDTO.MemberMissionListDTO toMemberMissionListDTO(String status) {
         MissionResDTO.MemberMissionDTO mission1 = MissionResDTO.MemberMissionDTO.builder()
                 .memberMissionId(1L)
                 .reward(500)
@@ -38,12 +38,31 @@ public class MissionConverter {
                 .status(Success.NONE)
                 .build();
 
-        List<MissionResDTO.MemberMissionDTO> missions = Arrays.asList(mission1, mission2, mission3, mission4).stream()
-                .filter(m->m.status()==status)
-                .toList();
+        MissionResDTO.MemberMissionDTO mission5 = MissionResDTO.MemberMissionDTO.builder()
+                .memberMissionId(5L)
+                .reward(500)
+                .content("12,000원 이상의 식사를 하세요!")
+                .status(Success.FAIL)
+                .build();
+
+        List<MissionResDTO.MemberMissionDTO> missions = Arrays.asList(mission1, mission2, mission3, mission4, mission5);
+
+        List<MissionResDTO.MemberMissionDTO> filtered = switch (status) {
+            case "ONGOING" -> missions.stream()
+                    .filter(m -> m.status() == Success.NONE)
+                    .toList();
+            case "FINISHED" -> missions.stream()
+                    .filter(m -> m.status() == Success.SUCCESS)
+                    .toList();
+            case "FAILED" -> missions.stream()
+                    .filter(m -> m.status() == Success.FAIL)
+                    .toList();
+            default -> throw new IllegalArgumentException("Unknown status: " + status);
+        };
+
 
         return MissionResDTO.MemberMissionListDTO.builder()
-                .missions(missions)
+                .missions(filtered)
                 .build();
     }
 }
