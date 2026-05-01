@@ -8,7 +8,7 @@ import java.util.List;
 public class MissionResDTO {
 
     @Builder
-    public record MissionListDTO(
+    public record MemberMissionListDTO(
             List<MemberMissionDTO> missions
     ) {}
 

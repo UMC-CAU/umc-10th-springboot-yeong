@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class MissionController {
     // 미션 조회
     @GetMapping("/missions")
-    public ApiResponse<MissionResDTO.MemberMissionDTO> missions(
+    public ApiResponse<MissionResDTO.MemberMissionListDTO> missions(
             @RequestParam Success status
             ){
-        return ApiResponse.onSuccess(MissionSuccessCode.MISSION_LIST_SUCCESS, MissionConverter.toMemberMissionDTO(status));
+        return ApiResponse.onSuccess(MissionSuccessCode.MEMBER_MISSION_LIST_SUCCESS, MissionConverter.toMemberMissionListDTO(status));
     }
 }
