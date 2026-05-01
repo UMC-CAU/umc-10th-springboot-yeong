@@ -51,7 +51,7 @@ public class MissionConverter {
             case "ONGOING" -> missions.stream()
                     .filter(m -> m.status() == Success.NONE)
                     .toList();
-            case "FINISHED" -> missions.stream()
+            case "COMPLETED" -> missions.stream()
                     .filter(m -> m.status() == Success.SUCCESS)
                     .toList();
             case "FAILED" -> missions.stream()
