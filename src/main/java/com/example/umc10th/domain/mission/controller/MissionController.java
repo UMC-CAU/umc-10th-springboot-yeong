@@ -2,7 +2,6 @@ package com.example.umc10th.domain.mission.controller;
 
 import com.example.umc10th.domain.mission.converter.MissionConverter;
 import com.example.umc10th.domain.mission.dto.MissionResDTO;
-import com.example.umc10th.domain.mission.enums.Success;
 import com.example.umc10th.domain.mission.exception.code.MissionSuccessCode;
 import com.example.umc10th.global.apiPayload.ApiResponse;
 import lombok.RequiredArgsConstructor;

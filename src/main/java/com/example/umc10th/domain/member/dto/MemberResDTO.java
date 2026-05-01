@@ -6,11 +6,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class MemberResDTO {
+    // 홈 화면
     @Builder
     public record HomeDTO(
             Long userId,
             String location,
-            Integer point,
+            Integer points,
             Boolean isAlarm,
             Integer completedMissionCount,
             List<MissionDTO> missions
@@ -25,9 +26,20 @@ public class MemberResDTO {
             Integer points
     ) {}
 
+    // 회원가입
     @Builder
     public record SignUpDTO(
             Long memberId,
             LocalDateTime createdAt
+    ){}
+
+    // 마이페이지
+    @Builder
+    public record MyPageDTO(
+            Long memberId,
+            String name,
+            String email,
+            String phone,
+            Integer points
     ){}
 }

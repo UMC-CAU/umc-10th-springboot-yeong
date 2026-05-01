@@ -32,4 +32,10 @@ public class MemberController {
     public ApiResponse<MemberResDTO.SignUpDTO> signUp(@RequestBody MemberReqDTO.SignUp signUp) {
         return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_SIGNUP_SUCCESS, MemberConverter.toSignUpDTO());
     }
+
+    // 마이페이지
+    @GetMapping("/api/v1/mypage")
+    public ApiResponse<MemberResDTO.MyPageDTO> myPage() {
+        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_MYPAGE_SUCCESS, MemberConverter.toMyPageDTO());
+    }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 public class MemberReqDTO {
 
+    // 회원가입
     public record SignUp(
             String name,
             Gender gender,

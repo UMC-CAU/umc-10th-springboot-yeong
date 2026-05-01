@@ -35,7 +35,7 @@ public class MemberConverter {
         return MemberResDTO.HomeDTO.builder()
                 .userId(1L)
                 .location("안암동")
-                .point(999999)
+                .points(999999)
                 .isAlarm(true)
                 .completedMissionCount(7)
                 .missions(List.of(mission1, mission2, mission3))
@@ -48,5 +48,17 @@ public class MemberConverter {
                 .memberId(1L)
                 .createdAt(java.time.LocalDateTime.now())
                 .build();
+    }
+
+    // 마이페이지
+    public static MemberResDTO.MyPageDTO toMyPageDTO(){
+        return MemberResDTO.MyPageDTO.builder()
+                .memberId(1L)
+                .name("홍길동")
+                .email("12345@google.com")
+                .phone("010-1234-5678")
+                .points(2500)
+                .build();
+
     }
 }
