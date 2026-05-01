@@ -2,12 +2,13 @@ package com.example.umc10th.domain.member.converter;
 
 import com.example.umc10th.domain.member.dto.MemberResDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class MemberConverter {
 
     // 홈
-    public static MemberResDTO.HomeDTO toHomeDTO() {
+    public static MemberResDTO.HomeDTO toHomeDTO(Long regionId, LocalDate cursorEndDate, Long cursorMissionId, Integer size) {
         MemberResDTO.MissionDTO mission1 = MemberResDTO.MissionDTO.builder()
                 .missionId(1L)
                 .name("반이학생마라탕")

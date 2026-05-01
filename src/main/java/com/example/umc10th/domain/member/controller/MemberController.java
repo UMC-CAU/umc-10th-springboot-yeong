@@ -9,6 +9,8 @@ import com.example.umc10th.global.apiPayload.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
@@ -20,11 +22,11 @@ public class MemberController {
     @GetMapping("/api/v1/members/me/home")
     public ApiResponse<MemberResDTO.HomeDTO> home(
             @RequestParam Long regionId,
-            @RequestParam(required = false) String cursorEndDate,
+            @RequestParam(required = false) LocalDate cursorEndDate,
             @RequestParam(required = false) Long cursorMissionId,
             @RequestParam(defaultValue = "10") Integer size
     ) {
-        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_HOME_SUCCESS, MemberConverter.toHomeDTO());
+        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_HOME_SUCCESS, MemberConverter.toHomeDTO(regionId, cursorEndDate, cursorMissionId, size));
     }
 
     // 회원가입
