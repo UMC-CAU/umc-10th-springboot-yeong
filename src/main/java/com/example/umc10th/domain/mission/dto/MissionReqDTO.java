@@ -1,8 +1,13 @@
 package com.example.umc10th.domain.mission.dto;
 
-public class MissionReqDTO {
+import com.example.umc10th.domain.mission.enums.Success;
 
-    public record MissionList(
-            String status
+import java.time.LocalDate;
+
+public class MissionReqDTO {
+    // 미션 성공 승인
+    public record MissionSuccessConfirm(
+            Success status,
+            LocalDate completedAt
     ){}
 }
