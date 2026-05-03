@@ -18,6 +18,8 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member")
 public class Member extends BaseEntity {
@@ -81,19 +83,4 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<Review> reviews = new ArrayList<>();
-
-    @Builder
-    private Member(String name, Gender gender, LocalDate birth, String address,
-                   String email, String phone, Provider socialProvider, String socialId) {
-        this.name = name;
-        this.gender = gender;
-        this.birth = birth;
-        this.address = address;
-        this.email = email;
-        this.phone = phone;
-        this.socialProvider = socialProvider;
-        this.socialId = socialId;
-
-        this.point = 0; // 내부에서만 설정
-    }
 }
