@@ -2,63 +2,47 @@ package com.example.umc10th.domain.member.converter;
 
 import com.example.umc10th.domain.member.dto.MemberResDTO;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class MemberConverter {
 
     // 홈
-    public static MemberResDTO.HomeDTO toHomeDTO(Long regionId, LocalDate cursorEndDate, Long cursorMissionId, Integer size) {
-        MemberResDTO.MissionDTO mission1 = MemberResDTO.MissionDTO.builder()
-                .missionId(1L)
-                .name("반이학생마라탕")
-                .category("중식당")
-                .endDate("D-7")
-                .points(500)
-                .build();
-
-        MemberResDTO.MissionDTO mission2 = MemberResDTO.MissionDTO.builder()
-                .missionId(2L)
-                .name("반이학생마라탕")
-                .category("중식당")
-                .endDate("D-7")
-                .points(500)
-                .build();
-
-        MemberResDTO.MissionDTO mission3 = MemberResDTO.MissionDTO.builder()
-                .missionId(3L)
-                .name("반이학생마라탕")
-                .category("중식당")
-                .endDate("D-7")
-                .points(500)
-                .build();
-
+    public static MemberResDTO.HomeDTO toHomeDTO(
+            Long userId,
+            String location,
+            Integer points,
+            Boolean isAlarm,
+            Integer completedMissionCount,
+            List<MemberResDTO.MissionDTO> missions
+    ) {
         return MemberResDTO.HomeDTO.builder()
-                .userId(1L)
-                .location("안암동")
-                .points(999999)
-                .isAlarm(true)
-                .completedMissionCount(7)
-                .missions(List.of(mission1, mission2, mission3))
+                .userId(userId)
+                .location(location)
+                .points(points)
+                .isAlarm(isAlarm)
+                .completedMissionCount(completedMissionCount)
+                .missions(missions)
                 .build();
     }
 
     // 회원가입
-    public static MemberResDTO.SignUpDTO toSignUpDTO(){
+    public static MemberResDTO.SignUpDTO toSignUpDTO(Long memberId){
         return MemberResDTO.SignUpDTO.builder()
-                .memberId(1L)
+                .memberId(memberId)
                 .createdAt(java.time.LocalDateTime.now())
                 .build();
     }
 
     // 마이페이지
-    public static MemberResDTO.MyPageDTO toMyPageDTO(){
+    public static MemberResDTO.MyPageDTO toMyPageDTO(
+            Long memberId, String name, String email, String phone, Integer points
+    ){
         return MemberResDTO.MyPageDTO.builder()
-                .memberId(1L)
-                .name("홍길동")
-                .email("12345@google.com")
-                .phone("010-1234-5678")
-                .points(2500)
+                .memberId(memberId)
+                .name(name)
+                .email(email)
+                .phone(phone)
+                .points(points)
                 .build();
 
     }

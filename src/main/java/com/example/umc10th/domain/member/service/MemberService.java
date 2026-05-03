@@ -1,55 +1,57 @@
 package com.example.umc10th.domain.member.service;
 
-import com.example.umc10th.domain.member.repository.MemberRepository;
+import com.example.umc10th.domain.member.converter.MemberConverter;
+import com.example.umc10th.domain.member.dto.MemberReqDTO;
+import com.example.umc10th.domain.member.dto.MemberResDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
-    private final MemberRepository memberRepository;
+    // 홈 화면
+    public MemberResDTO.HomeDTO getHome(Long regionId, LocalDate cursorEndDate, Long cursorMissionId, Integer size) {
+        // 더미 생성
+        List<MemberResDTO.MissionDTO> missions = List.of(
+                MemberResDTO.MissionDTO.builder()
+                        .missionId(1L).name("반이학생마라탕").category("중식당").endDate("D-7").points(500)
+                        .build(),
+                MemberResDTO.MissionDTO.builder()
+                        .missionId(2L).name("반이학생마라탕").category("중식당").endDate("D-7").points(500)
+                        .build(),
+                MemberResDTO.MissionDTO.builder()
+                        .missionId(3L).name("반이학생마라탕").category("중식당").endDate("D-7").points(500)
+                        .build()
+        );
 
-//    // 마이페이지
-//    public MemberResDTO.GetInfo getInfo(MemberReqDTO.GetInfo dto) {
-//        // DTO에서 유저 ID를 추출
-//        Long memberId = dto.id();
-//        // DB에서 해당 유저 ID로 데이터 조회
-//        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
-//        // 컨버터를 이용해서 응답 DTO 생성 & return
-//        return MemberConverter.toGetInfo(member);
-//    }
+        return MemberConverter.toHomeDTO(
+                1L,
+                "안암동",
+                999999,
+                true,
+                7,
+                missions
+        );
+    }
 
-//    @Transactional
-//    public String createUser(){
-//        Member member = Member.builder()
-//                .name("test")
-//                .gender(Gender.MALE)
-//                .birth(LocalDate.of(2000, 1, 1))
-//                .address("seoul")
-//                .email("test@example.com")
-//                .phone("010-0000-0000")
-//                .socialProvider(Provider.KAKAO)
-//                .socialId("test-social-id")
-//                .point(0)
-//                .build();
-//        memberRepository.save(member);
-//        return "OK";
-//    }
-//
-//    @Transactional
-//    public String deleteUser(){
-//        memberRepository.deleteByName("test");
-//        return "OK";
-//    }
+    // 회원가입
+    public MemberResDTO.SignUpDTO signUp(MemberReqDTO.SignUp signUp) {
+        return MemberConverter.toSignUpDTO(1L);
+    }
 
-//    // Query Parameter
-//    public String singleParameter(String singleParameter){
-//        return singleParameter;
-//    }
-//
-//    // Request Body
-//    public MemberResDTO.RequestBody requestBody(MemberReqDTO.RequestBody dto){
-//        return MemberConverter.toRequestBody(dto.stringTest(), dto.longTest());
-//    }
+    // 마이페이지
+    public MemberResDTO.MyPageDTO getMyPage() {
+        return MemberConverter.toMyPageDTO(
+                1L,
+                "홍길동",
+                "12345@google.com",
+                "010-1234-5678",
+                2500
+        );
+    }
+
 }

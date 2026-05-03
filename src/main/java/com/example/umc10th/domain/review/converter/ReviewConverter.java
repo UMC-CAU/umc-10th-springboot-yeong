@@ -7,9 +7,9 @@ import static java.time.LocalDate.now;
 public class ReviewConverter {
 
     // 리뷰 작성
-    public static ReviewResDTO.ReviewDTO toReviewDTO() {
+    public static ReviewResDTO.ReviewDTO toReviewDTO(Long reviewId) {
         return ReviewResDTO.ReviewDTO.builder()
-                .reviewID(1L)
+                .reviewID(reviewId)
                 .createdAt(now())
                 .build();
     }
