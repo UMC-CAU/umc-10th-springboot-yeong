@@ -1,24 +1,34 @@
 package com.example.umc10th.domain.mission.dto;
 
-import com.example.umc10th.domain.mission.enums.Success;
+import com.example.umc10th.domain.mission.enums.Status;
 import lombok.Builder;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public class MissionResDTO {
+    @Builder
+    public record MissionDTO(
+            Long missionId,
+            String storeName,
+            String content,
+            LocalDate endDate,
+            Integer reward
+    ) {}
 
-    // 미션 목록 조회
+    // 멤버 미션 목록 조회
     @Builder
     public record MemberMissionListDTO(
-            List<MemberMissionDTO> missions
+            List<MemberMissionDTO> missions,
+            Boolean hasNext,
+            Long nextCursor
     ) {}
 
     @Builder
     public record MemberMissionDTO(
             Long memberMissionId,
             Integer reward,
-            Success status,
+            Status status,
             String content
     ){}
 
