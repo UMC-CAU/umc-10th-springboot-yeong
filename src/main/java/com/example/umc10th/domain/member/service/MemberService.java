@@ -6,6 +6,8 @@ import com.example.umc10th.domain.member.dto.MemberResDTO;
 import com.example.umc10th.domain.member.entity.Member;
 import com.example.umc10th.domain.member.repository.MemberRepository;
 import com.example.umc10th.domain.mission.dto.MissionResDTO;
+import com.example.umc10th.domain.mission.enums.Status;
+import com.example.umc10th.domain.mission.repository.MemberMissionRepository;
 import com.example.umc10th.domain.mission.repository.MissionRepository;
 import com.example.umc10th.domain.store.entity.Region;
 import com.example.umc10th.domain.store.repository.RegionRepository;
@@ -25,6 +27,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final RegionRepository regionRepository;
     private final MissionRepository missionRepository;
+    private final MemberMissionRepository memberMissionRepository;
 
     // 홈 화면
     public MemberResDTO.HomeDTO getHome(Long regionId, LocalDate cursorEndDate, Long cursorMissionId, Integer size) {
@@ -37,6 +40,7 @@ public class MemberService {
         Region region = regionRepository.findById(regionId)
                 .orElseThrow(() -> new RuntimeException("지역이 존재하지 않습니다."));
 
+        // 미션 조회 및 다음 커서 응답
         int requestSize = size;
         List<MissionResDTO.MissionDTO> dtos = missionRepository.findMissions(
                 memberId, regionId, cursorEndDate, cursorMissionId,
@@ -55,11 +59,14 @@ public class MemberService {
                     .build();
         }
 
+        // 지역별 완료한 미션 수 조회
+        Integer completedMissionCount = memberMissionRepository.countByMemberAndRegionAndStatus(memberId, regionId, Status.SUCCESS);
+
         return MemberConverter.toHomeDTO(
                 region.getName(),
                 member.getPoint(),
-                true,
-                7,
+                true,   // 알림 설정 여부 (나중에 변경)
+                completedMissionCount,
                 missions,
                 hasNext,
                 nextCursor

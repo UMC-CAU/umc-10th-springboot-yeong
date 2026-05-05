@@ -13,13 +13,13 @@ import java.util.List;
 public interface MemberMissionRepository extends JpaRepository<MemberMission,Long> {
 
     @Query("""
-    select new com.example.umc10th.domain.mission.dto.MissionResDTO$MemberMissionDTO(mm.id, m.reward, mm.status, m.content)
-    from MemberMission mm
-    join mm.mission m
-    where mm.member.id = :memberId
-      and (:status is null or mm.status = :status)
-      and (:cursor is null or mm.id > :cursor)
-    order by mm.id asc
+        select new com.example.umc10th.domain.mission.dto.MissionResDTO$MemberMissionDTO(mm.id, m.reward, mm.status, m.content)
+        from MemberMission mm
+        join mm.mission m
+        where mm.member.id = :memberId
+          and (:status is null or mm.status = :status)
+          and (:cursor is null or mm.id > :cursor)
+        order by mm.id asc
     """)
 
     List<MissionResDTO.MemberMissionDTO> findMissions(
@@ -27,5 +27,21 @@ public interface MemberMissionRepository extends JpaRepository<MemberMission,Lon
             @Param("status") Status status,
             @Param("cursor") Long cursor,
             Pageable pageable
+    );
+
+    @Query("""
+        select count(mm)
+        from MemberMission mm
+        join mm.mission m
+        join m.store s
+        where mm.member.id = :memberId
+            and s.region.id = :regionId
+            and mm.status = :status
+    """)
+
+    Integer countByMemberAndRegionAndStatus(
+            @Param("memberId") Long memberId,
+            @Param("regionId") Long regionId,
+            @Param("status") Status status
     );
 }
