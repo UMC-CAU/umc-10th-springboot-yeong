@@ -48,10 +48,11 @@ public class Review extends BaseEntity {
     private MemberMission memberMission;
 
     @Builder
-    private Review(int score, String content, Member member, Store store, MemberMission memberMission) {
+    private Review(Long id, int score, String content, Member member, Store store, MemberMission memberMission) {
         this.score = score;
         this.content = content;
         this.member = member;
         this.store = store;
+        this.memberMission = memberMission;
     }
 }
