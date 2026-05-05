@@ -3,8 +3,15 @@ package com.example.umc10th.domain.member.service;
 import com.example.umc10th.domain.member.converter.MemberConverter;
 import com.example.umc10th.domain.member.dto.MemberReqDTO;
 import com.example.umc10th.domain.member.dto.MemberResDTO;
+import com.example.umc10th.domain.member.entity.Member;
+import com.example.umc10th.domain.member.repository.MemberRepository;
+import com.example.umc10th.domain.mission.dto.MissionResDTO;
+import com.example.umc10th.domain.mission.repository.MissionRepository;
+import com.example.umc10th.domain.store.entity.Region;
+import com.example.umc10th.domain.store.repository.RegionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -15,28 +22,47 @@ import java.util.List;
 @Transactional
 public class MemberService {
 
+    private final MemberRepository memberRepository;
+    private final RegionRepository regionRepository;
+    private final MissionRepository missionRepository;
+
     // 홈 화면
     public MemberResDTO.HomeDTO getHome(Long regionId, LocalDate cursorEndDate, Long cursorMissionId, Integer size) {
-        // 더미 생성
-        List<MemberResDTO.MissionDTO> missions = List.of(
-                MemberResDTO.MissionDTO.builder()
-                        .missionId(1L).name("반이학생마라탕").category("중식당").endDate("D-7").points(500)
-                        .build(),
-                MemberResDTO.MissionDTO.builder()
-                        .missionId(2L).name("반이학생마라탕").category("중식당").endDate("D-7").points(500)
-                        .build(),
-                MemberResDTO.MissionDTO.builder()
-                        .missionId(3L).name("반이학생마라탕").category("중식당").endDate("D-7").points(500)
-                        .build()
+
+        Long memberId = 1L; // Seed에서 만든 더미 유저 (나중에 변경)
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+
+        Region region = regionRepository.findById(regionId)
+                .orElseThrow(() -> new RuntimeException("지역이 존재하지 않습니다."));
+
+        int requestSize = size;
+        List<MissionResDTO.MissionDTO> dtos = missionRepository.findMissions(
+                memberId, regionId, cursorEndDate, cursorMissionId,
+                PageRequest.of(0, requestSize + 1)
         );
 
+        boolean hasNext = dtos.size() > requestSize;
+        List<MissionResDTO.MissionDTO> missions = hasNext ? dtos.subList(0, requestSize) : dtos;
+
+        MemberResDTO.NextCursor nextCursor = null;
+        if (hasNext && !missions.isEmpty()) {
+            MissionResDTO.MissionDTO last = missions.get(missions.size() - 1);
+            nextCursor = MemberResDTO.NextCursor.builder()
+                    .endDate(last.endDate())
+                    .missionId(last.missionId())
+                    .build();
+        }
+
         return MemberConverter.toHomeDTO(
-                1L,
-                "안암동",
-                999999,
+                region.getName(),
+                member.getPoint(),
                 true,
                 7,
-                missions
+                missions,
+                hasNext,
+                nextCursor
         );
     }
 
@@ -47,12 +73,17 @@ public class MemberService {
 
     // 마이페이지
     public MemberResDTO.MyPageDTO getMyPage() {
+        Long memberId = 1L; // // Seed에서 만든 더미 유저 (나중에 변경)
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+
         return MemberConverter.toMyPageDTO(
-                1L,
-                "홍길동",
-                "12345@google.com",
-                "010-1234-5678",
-                2500
+                member.getId(),
+                member.getName(),
+                member.getEmail(),
+                member.getPhone(),
+                member.getPoint()
         );
     }
 
