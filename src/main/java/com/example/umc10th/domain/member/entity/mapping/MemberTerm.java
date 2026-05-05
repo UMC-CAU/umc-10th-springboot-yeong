@@ -33,6 +33,6 @@ public class MemberTerm {
     private MemberTerm(Member member, Term term, boolean isAgreed) {
         this.member = member;
         this.term = term;
-        this.isAgreed = false;
+        this.isAgreed = isAgreed;
     }
 }
