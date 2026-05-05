@@ -4,6 +4,9 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+.DS_Store
+.AppleDouble
+.LSOverride
 
 ### 민감정보 ###
 .env
@@ -11,7 +14,7 @@ build/
 ### STS ###
 .apt_generated
 .classpath
-.factorypath
+.factorypat
 .project
 .settings
 .springBeans

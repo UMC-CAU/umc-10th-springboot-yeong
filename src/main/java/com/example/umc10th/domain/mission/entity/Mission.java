@@ -2,7 +2,10 @@ package com.example.umc10th.domain.mission.entity;
 
 import com.example.umc10th.domain.store.entity.Store;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,7 +28,7 @@ public class Mission {
     private int reward;
 
     @Column(nullable = false)
-    private LocalDate end_date;
+    private LocalDate endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
@@ -35,9 +38,10 @@ public class Mission {
     private List<MemberMission> memberMissions = new ArrayList<>();
 
     @Builder
-    private Mission(String content, int reward, LocalDate end_date) {
+    private Mission(String content, int reward, LocalDate endDate, Store store) {
         this.content = content;
         this.reward = reward;
-        this.end_date = end_date;
+        this.endDate = endDate;
+        this.store = store;
     }
 }

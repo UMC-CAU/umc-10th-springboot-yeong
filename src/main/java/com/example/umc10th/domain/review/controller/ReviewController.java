@@ -17,6 +17,6 @@ public class ReviewController {
     // 리뷰 작성
     @PostMapping("/reviews")
     public ApiResponse<ReviewResDTO.ReviewDTO> reviews(@RequestBody ReviewReqDTO.Review reviewReq) {
-        return ApiResponse.onSuccess(ReviewSuccessCode.REVIEW_WRITE_SUCCESS, reviewService.getReview(reviewReq));
+        return ApiResponse.onSuccess(ReviewSuccessCode.REVIEW_WRITE_SUCCESS, reviewService.postReview(reviewReq));
     }
 }

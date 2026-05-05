@@ -9,9 +9,11 @@ import static java.time.LocalDate.now;
 public class MissionConverter {
 
     // 미션 조회
-    public static MissionResDTO.MemberMissionListDTO toMemberMissionListDTO(List<MissionResDTO.MemberMissionDTO> missions) {
+    public static MissionResDTO.MemberMissionListDTO toMemberMissionListDTO(List<MissionResDTO.MemberMissionDTO> missions, boolean hasNext, Long nextCursor) {
         return MissionResDTO.MemberMissionListDTO.builder()
                 .missions(missions)
+                .hasNext(hasNext)
+                .nextCursor(nextCursor)
                 .build();
     }
 
