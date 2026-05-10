@@ -99,6 +99,13 @@ public class MissionService {
 
     // 미션 성공 요청
     public MissionResDTO.MissionSuccessRequestDTO getMissionSuccessRequest(Long missionId) {
+        MissionResDTO.MemberMissionDTO target = dummy().stream()
+                .filter(m->m.memberMissionId().equals(missionId))
+                .findFirst()
+                .orElseThrow(() -> new MissionException(MissionErrorCode.MISSION_NOT_FOUND));
+
+        if (target.status()!= Status.NONE) {throw new MissionException(MissionErrorCode.MISSION_ALREADY_PROCESSED);}
+
         return MissionConverter.toMissionSuccessRequestDTO(missionId);
     }
 
