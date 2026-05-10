@@ -1,6 +1,8 @@
 package com.example.umc10th.domain.mission.converter;
 
 import com.example.umc10th.domain.mission.dto.MissionResDTO;
+import com.example.umc10th.domain.mission.entity.MemberMission;
+import com.example.umc10th.domain.mission.entity.Mission;
 
 import java.util.List;
 
@@ -8,10 +10,33 @@ import static java.time.LocalDate.now;
 
 public class MissionConverter {
 
+    // 멤버 미션 단건 변환 (엔티티 -> DTO)
+    public static MissionResDTO.MemberMissionDTO toMemberMissionDTO(MemberMission mm) {
+        return new MissionResDTO.MemberMissionDTO(
+                mm.getId(),
+                mm.getMission().getReward(),
+                mm.getStatus(),
+                mm.getMission().getContent()
+        );
+    }
+
+    // 미션 단건 변환 (엔티티 -> DTO)
+    public static MissionResDTO.MissionDTO toMissionDTO(Mission m) {
+        return new MissionResDTO.MissionDTO(
+                m.getId(),
+                m.getStore().getName(),
+                m.getContent(),
+                m.getEndDate(),
+                m.getReward()
+        );
+    }
+
     // 미션 조회
-    public static MissionResDTO.MemberMissionListDTO toMemberMissionListDTO(List<MissionResDTO.MemberMissionDTO> missions) {
+    public static MissionResDTO.MemberMissionListDTO toMemberMissionListDTO(List<MissionResDTO.MemberMissionDTO> missions, boolean hasNext, Long nextCursor) {
         return MissionResDTO.MemberMissionListDTO.builder()
                 .missions(missions)
+                .hasNext(hasNext)
+                .nextCursor(nextCursor)
                 .build();
     }
 

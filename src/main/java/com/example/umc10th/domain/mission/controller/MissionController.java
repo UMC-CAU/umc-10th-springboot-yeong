@@ -16,8 +16,12 @@ public class MissionController {
     // 미션 조회
     @GetMapping("/members/me/missions")
     public ApiResponse<MissionResDTO.MemberMissionListDTO> missions(
-            @RequestParam String status) {
-        return ApiResponse.onSuccess(MissionSuccessCode.MEMBER_MISSION_LIST_SUCCESS, missionService.getMissionList(status));
+            @RequestParam Long memberId,
+            @RequestParam String status,
+            @RequestParam(required = false) Long cursorMissionId,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        return ApiResponse.onSuccess(MissionSuccessCode. MEMBER_MISSION_LIST_SUCCESS, missionService.getMissionList(memberId, status, cursorMissionId, size));
     }
 
     // 미션 성공 요청

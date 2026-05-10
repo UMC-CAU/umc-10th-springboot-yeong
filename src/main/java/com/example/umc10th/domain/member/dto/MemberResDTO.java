@@ -1,7 +1,9 @@
 package com.example.umc10th.domain.member.dto;
 
+import com.example.umc10th.domain.mission.dto.MissionResDTO;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -9,22 +11,20 @@ public class MemberResDTO {
     // 홈 화면
     @Builder
     public record HomeDTO(
-            Long userId,
             String location,
             Integer points,
             Boolean isAlarm,
             Integer completedMissionCount,
-            List<MissionDTO> missions
+            List<MissionResDTO.MissionDTO> missions,
+            Boolean hasNext,
+            NextCursor nextCursor
     ){}
 
     @Builder
-    public record MissionDTO(
-            Long missionId,
-            String name,
-            String category,
-            String endDate,
-            Integer points
-    ) {}
+    public record NextCursor(
+            LocalDate endDate,
+            Long missionId
+    ){}
 
     // 회원가입
     @Builder

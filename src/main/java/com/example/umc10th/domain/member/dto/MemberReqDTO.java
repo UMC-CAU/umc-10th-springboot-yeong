@@ -9,14 +9,14 @@ public class MemberReqDTO {
 
     // 회원가입
     public record SignUp(
+            String password,
             String name,
             Gender gender,
             LocalDate birth,
             String address,
             String email,
-            String password,
             String phone,
-            List<String> preferFoodIds,
+            List<Long> preferFoodIds,
             Agreements agreements
 
     ){}

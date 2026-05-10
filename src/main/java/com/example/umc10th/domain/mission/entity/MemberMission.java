@@ -1,7 +1,7 @@
 package com.example.umc10th.domain.mission.entity;
 
 import com.example.umc10th.domain.member.entity.Member;
-import com.example.umc10th.domain.mission.enums.Success;
+import com.example.umc10th.domain.mission.enums.Status;
 import com.example.umc10th.domain.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,7 +23,7 @@ public class MemberMission {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Success success;
+    private Status status;
 
     @Column(nullable = false)
     private LocalDate started_at;
@@ -43,11 +43,13 @@ public class MemberMission {
     private Review review;
 
     @Builder
-    private MemberMission(Member member, Mission mission, Success success) {
+    private MemberMission(Member member, Mission mission, Status status, Review review) {
         this.member = member;
         this.mission = mission;
-        this.success = success;
+        this.status = status;
         this.started_at = LocalDate.now();
+        this.completed_at = null;
+        this.review = review;
     }
 
 }

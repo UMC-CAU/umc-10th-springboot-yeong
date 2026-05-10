@@ -2,13 +2,15 @@ package com.example.umc10th.domain.review.dto;
 
 import lombok.Builder;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ReviewResDTO {
 
     @Builder
     public record ReviewDTO(
             Long reviewID,
-            LocalDate createdAt
+            Integer scores,
+            String contents,
+            LocalDateTime createdAt
     ){}
 }

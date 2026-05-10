@@ -20,12 +20,13 @@ public class MemberController {
     // 홈
     @GetMapping("/api/v1/members/me/home")
     public ApiResponse<MemberResDTO.HomeDTO> home(
+            @RequestParam Long memberId,
             @RequestParam Long regionId,
             @RequestParam(required = false) LocalDate cursorEndDate,
             @RequestParam(required = false) Long cursorMissionId,
             @RequestParam(defaultValue = "10") Integer size
     ) {
-        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_HOME_SUCCESS, memberService.getHome(regionId, cursorEndDate, cursorMissionId, size));
+        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_HOME_SUCCESS, memberService.getHome(memberId, regionId, cursorEndDate, cursorMissionId, size));
     }
 
     // 회원가입
@@ -36,7 +37,9 @@ public class MemberController {
 
     // 마이페이지
     @GetMapping("/api/v1/mypage")
-    public ApiResponse<MemberResDTO.MyPageDTO> myPage() {
-        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_MYPAGE_SUCCESS, memberService.getMyPage());
+    public ApiResponse<MemberResDTO.MyPageDTO> myPage(
+            @RequestParam Long memberId
+    ) {
+        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_MYPAGE_SUCCESS, memberService.getMyPage(memberId));
     }
 }
