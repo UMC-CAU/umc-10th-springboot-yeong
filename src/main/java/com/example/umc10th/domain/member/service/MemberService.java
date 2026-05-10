@@ -4,12 +4,18 @@ import com.example.umc10th.domain.member.converter.MemberConverter;
 import com.example.umc10th.domain.member.dto.MemberReqDTO;
 import com.example.umc10th.domain.member.dto.MemberResDTO;
 import com.example.umc10th.domain.member.entity.Member;
+import com.example.umc10th.domain.member.exception.MemberException;
+import com.example.umc10th.domain.member.exception.code.MemberErrorCode;
 import com.example.umc10th.domain.member.repository.MemberRepository;
+import com.example.umc10th.domain.mission.converter.MissionConverter;
 import com.example.umc10th.domain.mission.dto.MissionResDTO;
+import com.example.umc10th.domain.mission.entity.Mission;
 import com.example.umc10th.domain.mission.enums.Status;
 import com.example.umc10th.domain.mission.repository.MemberMissionRepository;
 import com.example.umc10th.domain.mission.repository.MissionRepository;
 import com.example.umc10th.domain.store.entity.Region;
+import com.example.umc10th.domain.store.exception.StoreException;
+import com.example.umc10th.domain.store.exception.code.StoreErrorCode;
 import com.example.umc10th.domain.store.repository.RegionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,32 +36,34 @@ public class MemberService {
     private final MemberMissionRepository memberMissionRepository;
 
     // 홈 화면
-    public MemberResDTO.HomeDTO getHome(Long regionId, LocalDate cursorEndDate, Long cursorMissionId, Integer size) {
-
-        Long memberId = 1L; // Seed에서 만든 더미 유저 (나중에 변경)
+    public MemberResDTO.HomeDTO getHome(Long memberId, Long regionId, LocalDate cursorEndDate, Long cursorMissionId, Integer size) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         Region region = regionRepository.findById(regionId)
-                .orElseThrow(() -> new RuntimeException("지역이 존재하지 않습니다."));
+                .orElseThrow(() -> new StoreException(StoreErrorCode.REGION_NOT_FOUND));
 
         // 미션 조회 및 다음 커서 응답
         int requestSize = size;
-        List<MissionResDTO.MissionDTO> dtos = missionRepository.findMissions(
+        List<Mission> entities = missionRepository.findMissions(
                 memberId, regionId, cursorEndDate, cursorMissionId,
                 PageRequest.of(0, requestSize + 1)
         );
 
-        boolean hasNext = dtos.size() > requestSize;
-        List<MissionResDTO.MissionDTO> missions = hasNext ? dtos.subList(0, requestSize) : dtos;
+        boolean hasNext = entities.size() > requestSize;
+        List<Mission> page = hasNext ? entities.subList(0, requestSize) : entities;
+
+        List<MissionResDTO.MissionDTO> missions = page.stream()
+                .map(MissionConverter::toMissionDTO)
+                .toList();
 
         MemberResDTO.NextCursor nextCursor = null;
-        if (hasNext && !missions.isEmpty()) {
-            MissionResDTO.MissionDTO last = missions.get(missions.size() - 1);
+        if (hasNext && !page.isEmpty()) {
+            Mission last = page.get(page.size() - 1);
             nextCursor = MemberResDTO.NextCursor.builder()
-                    .endDate(last.endDate())
-                    .missionId(last.missionId())
+                    .endDate(last.getEndDate())
+                    .missionId(last.getId())
                     .build();
         }
 
@@ -79,11 +87,10 @@ public class MemberService {
     }
 
     // 마이페이지
-    public MemberResDTO.MyPageDTO getMyPage() {
-        Long memberId = 1L; // // Seed에서 만든 더미 유저 (나중에 변경)
+    public MemberResDTO.MyPageDTO getMyPage(Long memberId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         return MemberConverter.toMyPageDTO(
                 member.getId(),

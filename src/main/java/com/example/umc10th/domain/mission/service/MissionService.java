@@ -2,7 +2,10 @@ package com.example.umc10th.domain.mission.service;
 
 import com.example.umc10th.domain.mission.converter.MissionConverter;
 import com.example.umc10th.domain.mission.dto.MissionResDTO;
+import com.example.umc10th.domain.mission.entity.MemberMission;
 import com.example.umc10th.domain.mission.enums.Status;
+import com.example.umc10th.domain.mission.exception.MissionException;
+import com.example.umc10th.domain.mission.exception.code.MissionErrorCode;
 import com.example.umc10th.domain.mission.repository.MemberMissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -63,7 +66,7 @@ public class MissionService {
     }
 
     // 미션 조회
-    public MissionResDTO.MemberMissionListDTO getMissionList(String statusStr, Long cursorMissionId, Integer size) {
+    public MissionResDTO.MemberMissionListDTO getMissionList(Long memberId, String statusStr, Long cursorMissionId, Integer size) {
         // 상태 필터
         Status status = switch (statusStr) {
             case "ONGOING" -> Status.NONE;
@@ -72,20 +75,23 @@ public class MissionService {
             default -> throw new IllegalArgumentException("Invalid status: " + statusStr);
         };
 
-        Long memberId = 1L;  // Seed에서 만든 더미 유저 (나중에 변경)
-
         int requestSize = size;
-        List<MissionResDTO.MemberMissionDTO> dtos = memberMissionRepository.findMissions(
+        List<MemberMission> entities = memberMissionRepository.findMissions(
                 memberId,
                 status,
                 cursorMissionId, PageRequest.of(0, requestSize + 1));
 
-        boolean hasNext = dtos.size() > requestSize;
+        boolean hasNext = entities.size() > requestSize;
 
-        List<MissionResDTO.MemberMissionDTO> missions = hasNext ? dtos.subList(0, requestSize) : dtos;
+        List<MemberMission> page = hasNext ? entities.subList(0, requestSize) : entities;
+
+        List<MissionResDTO.MemberMissionDTO> missions = page.stream()
+                .map(MissionConverter::toMemberMissionDTO)
+                .toList();
+
         Long nextCursor = null;
-        if (hasNext && !missions.isEmpty()) {
-            nextCursor = missions.get(missions.size() - 1).memberMissionId();
+        if (hasNext && !page.isEmpty()) {
+            nextCursor = page.get(missions.size() - 1).getId();
         }
 
         return MissionConverter.toMemberMissionListDTO(missions, hasNext, nextCursor);
@@ -101,9 +107,9 @@ public class MissionService {
         MissionResDTO.MemberMissionDTO target = dummy().stream()
                 .filter(m->m.memberMissionId().equals(missionId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 memberMissionId를 못찾음 : " + missionId));
+                .orElseThrow(() -> new MissionException(MissionErrorCode.MISSION_NOT_FOUND));
 
-        if (target.status()!= Status.NONE) {throw new IllegalArgumentException("이미 처리된 미션");}
+        if (target.status()!= Status.NONE) {throw new MissionException(MissionErrorCode.MISSION_ALREADY_PROCESSED);}
 
         return MissionConverter.toMissionSuccessConfirmDTO(missionId);
     }
