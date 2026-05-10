@@ -1,6 +1,5 @@
 package com.example.umc10th.domain.mission.repository;
 
-import com.example.umc10th.domain.mission.dto.MissionResDTO;
 import com.example.umc10th.domain.mission.entity.Mission;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,9 +12,9 @@ import java.util.List;
 public interface MissionRepository extends JpaRepository<Mission,Long> {
 
     @Query("""
-    select new com.example.umc10th.domain.mission.dto.MissionResDTO$MissionDTO(m.id, s.name, m.content, m.endDate, m.reward)
+    select m
     from Mission m
-    join m.store s
+    join fetch m.store s
     where s.region.id = :regionId
       and m.id not in (select mm.mission.id from MemberMission mm where mm.member.id = :memberId)
       and (
@@ -26,7 +25,7 @@ public interface MissionRepository extends JpaRepository<Mission,Long> {
     order by m.endDate asc, m.id asc
     """)
 
-    List<MissionResDTO.MissionDTO> findMissions(
+    List<Mission> findMissions(
             @Param("memberId") Long memberId,
             @Param("regionId") Long regionId,
             @Param("cursorEndDate") LocalDate cursorEndDate,

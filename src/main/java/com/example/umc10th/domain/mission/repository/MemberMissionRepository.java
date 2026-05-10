@@ -1,6 +1,5 @@
 package com.example.umc10th.domain.mission.repository;
 
-import com.example.umc10th.domain.mission.dto.MissionResDTO;
 import com.example.umc10th.domain.mission.entity.MemberMission;
 import com.example.umc10th.domain.mission.enums.Status;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +12,7 @@ import java.util.List;
 public interface MemberMissionRepository extends JpaRepository<MemberMission,Long> {
 
     @Query("""
-        select new com.example.umc10th.domain.mission.dto.MissionResDTO$MemberMissionDTO(mm.id, m.reward, mm.status, m.content)
+        select mm
         from MemberMission mm
         join mm.mission m
         where mm.member.id = :memberId
@@ -22,7 +21,7 @@ public interface MemberMissionRepository extends JpaRepository<MemberMission,Lon
         order by mm.id asc
     """)
 
-    List<MissionResDTO.MemberMissionDTO> findMissions(
+    List<MemberMission> findMissions(
             @Param("memberId") Long memberId,
             @Param("status") Status status,
             @Param("cursor") Long cursor,
