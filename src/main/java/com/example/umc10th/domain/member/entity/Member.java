@@ -29,7 +29,7 @@ public class Member extends BaseEntity {
     private Long id;
 
     // 비밀번호
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 60)
     private String password;
 
     // 이름
