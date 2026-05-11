@@ -25,10 +25,11 @@ public class Mission {
     private String content;
 
     @Column(nullable = false)
-    private int reward;
+    private Integer reward;
 
     @Column(nullable = false)
     private LocalDate endDate;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
@@ -38,7 +39,7 @@ public class Mission {
     private List<MemberMission> memberMissions = new ArrayList<>();
 
     @Builder
-    private Mission(String content, int reward, LocalDate endDate, Store store) {
+    private Mission(String content, Integer reward, LocalDate endDate, Store store) {
         this.content = content;
         this.reward = reward;
         this.endDate = endDate;

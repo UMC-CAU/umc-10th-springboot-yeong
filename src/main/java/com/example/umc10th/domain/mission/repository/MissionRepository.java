@@ -32,4 +32,6 @@ public interface MissionRepository extends JpaRepository<Mission,Long> {
             @Param("cursorMissionId") Long cursorMissionId,
             Pageable pageable
     );
+
+    List<Mission> findAllByStore_Id(Long storeId);
 }

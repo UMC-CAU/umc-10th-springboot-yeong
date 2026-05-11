@@ -1,69 +1,34 @@
 package com.example.umc10th.domain.mission.service;
 
 import com.example.umc10th.domain.mission.converter.MissionConverter;
+import com.example.umc10th.domain.mission.dto.MissionReqDTO;
 import com.example.umc10th.domain.mission.dto.MissionResDTO;
 import com.example.umc10th.domain.mission.entity.MemberMission;
+import com.example.umc10th.domain.mission.entity.Mission;
 import com.example.umc10th.domain.mission.enums.Status;
 import com.example.umc10th.domain.mission.exception.MissionException;
 import com.example.umc10th.domain.mission.exception.code.MissionErrorCode;
 import com.example.umc10th.domain.mission.repository.MemberMissionRepository;
+import com.example.umc10th.domain.mission.repository.MissionRepository;
+import com.example.umc10th.domain.store.entity.Store;
+import com.example.umc10th.domain.store.exception.StoreException;
+import com.example.umc10th.domain.store.exception.code.StoreErrorCode;
+import com.example.umc10th.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MissionService {
 
     private final MemberMissionRepository memberMissionRepository;
-
-    // 더미 데이터 생성
-    private static List<MissionResDTO.MemberMissionDTO> dummy() {
-        return List.of(
-                MissionResDTO.MemberMissionDTO.builder()
-                        .memberMissionId(1L)
-                        .reward(500)
-                        .content("12,000원 이상의 식사를 하세요!")
-                        .status(Status.SUCCESS)
-                        .build(),
-
-                MissionResDTO.MemberMissionDTO.builder()
-                        .memberMissionId(2L)
-                        .reward(500)
-                        .content("12,000원 이상의 식사를 하세요!")
-                        .status(Status.SUCCESS)
-                        .build(),
-                MissionResDTO.MemberMissionDTO.builder()
-                        .memberMissionId(3L)
-                        .reward(500)
-                        .content("12,000원 이상의 식사를 하세요!")
-                        .status(Status.SUCCESS)
-                        .build(),
-
-                MissionResDTO.MemberMissionDTO.builder()
-                        .memberMissionId(4L)
-                        .reward(500)
-                        .content("12,000원 이상의 식사를 하세요!")
-                        .status(Status.NONE)
-                        .build(),
-
-                MissionResDTO.MemberMissionDTO.builder()
-                        .memberMissionId(5L)
-                        .reward(500)
-                        .content("12,000원 이상의 식사를 하세요!")
-                        .status(Status.NONE)
-                        .build(),
-
-                MissionResDTO.MemberMissionDTO.builder()
-                        .memberMissionId(6L)
-                        .reward(500)
-                        .content("12,000원 이상의 식사를 하세요!")
-                        .status(Status.FAIL)
-                        .build()
-        );
-    }
+    private final StoreRepository storeRepository;
+    private final MissionRepository missionRepository;
 
     // 미션 조회
     public MissionResDTO.MemberMissionListDTO getMissionList(Long memberId, String statusStr, Long cursorMissionId, Integer size) {
@@ -72,7 +37,7 @@ public class MissionService {
             case "ONGOING" -> Status.NONE;
             case "COMPLETED" -> Status.SUCCESS;
             case "FAILED" -> Status.FAIL;
-            default -> throw new IllegalArgumentException("Invalid status: " + statusStr);
+            default -> throw new MissionException(MissionErrorCode.INVALID_STATUS);
         };
 
         int requestSize = size;
@@ -91,33 +56,64 @@ public class MissionService {
 
         Long nextCursor = null;
         if (hasNext && !page.isEmpty()) {
-            nextCursor = page.get(missions.size() - 1).getId();
+            nextCursor = page.get(page.size() - 1).getId();
         }
 
         return MissionConverter.toMemberMissionListDTO(missions, hasNext, nextCursor);
     }
 
     // 미션 성공 요청
-    public MissionResDTO.MissionSuccessRequestDTO getMissionSuccessRequest(Long missionId) {
-        MissionResDTO.MemberMissionDTO target = dummy().stream()
-                .filter(m->m.memberMissionId().equals(missionId))
-                .findFirst()
+    public MissionResDTO.MissionSuccessRequestDTO getMissionSuccessRequest(Long memberMissionId) {
+        MemberMission mm = memberMissionRepository.findById(memberMissionId)
                 .orElseThrow(() -> new MissionException(MissionErrorCode.MISSION_NOT_FOUND));
 
-        if (target.status()!= Status.NONE) {throw new MissionException(MissionErrorCode.MISSION_ALREADY_PROCESSED);}
+        if (mm.getStatus()!= Status.NONE) {throw new MissionException(MissionErrorCode.MISSION_ALREADY_PROCESSED);}
 
-        return MissionConverter.toMissionSuccessRequestDTO(missionId);
+        return MissionConverter.toMissionSuccessRequestDTO(memberMissionId);
     }
 
     // 미션 성공 승인
-    public MissionResDTO.MissionSuccessConfirmDTO getMissionSuccessConfirm(Long missionId) {
-        MissionResDTO.MemberMissionDTO target = dummy().stream()
-                .filter(m->m.memberMissionId().equals(missionId))
-                .findFirst()
+    @Transactional
+    public MissionResDTO.MissionSuccessConfirmDTO getMissionSuccessConfirm(Long memberMissionId) {
+        MemberMission mm = memberMissionRepository.findById(memberMissionId)
                 .orElseThrow(() -> new MissionException(MissionErrorCode.MISSION_NOT_FOUND));
 
-        if (target.status()!= Status.NONE) {throw new MissionException(MissionErrorCode.MISSION_ALREADY_PROCESSED);}
+        if (mm.getStatus()!= Status.NONE) {throw new MissionException(MissionErrorCode.MISSION_ALREADY_PROCESSED);}
 
-        return MissionConverter.toMissionSuccessConfirmDTO(missionId);
+        mm.confirmSuccess();
+
+        return MissionConverter.toMissionSuccessConfirmDTO(memberMissionId);
     }
+
+    // 가게 미션 생성
+    @Transactional
+    public Void createMission(
+            Long storeId,
+            MissionReqDTO.CreateMission dto
+    ) {
+        // 가게 찾기
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
+
+        // 미션 생성
+        Mission mission = MissionConverter.toMission(store, dto);
+
+        // 미션 DB 저장
+        missionRepository.save(mission);
+        return null;
+    }
+
+    // 가게 내 미션 조회
+    public List<MissionResDTO.GetMission> getMissions(
+            Long storeId
+    ){
+        // 가게 내 미션들 조회
+        List<Mission> missionList = missionRepository.findAllByStore_Id(storeId);
+
+        // 미션들 응답 DTO로 포장하기
+        return missionList.stream()
+                .map(MissionConverter::toGetMission)
+                .toList();
+    }
+
 }
