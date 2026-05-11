@@ -6,6 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public class MissionReqDTO {
+
+    // 미션 조회
+    public record MemberMission(
+            @NotNull(message = "memberId는 필수입니다.")
+            Long memberId
+    ){}
+
     // 가게 미션 생성
     public record CreateMission(
             @NotNull(message = "마감기한은 필수입니다.")

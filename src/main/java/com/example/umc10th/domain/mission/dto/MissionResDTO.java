@@ -25,6 +25,15 @@ public class MissionResDTO {
             Long nextCursor
     ) {}
 
+    // 페이지네이션 틀
+    @Builder
+    public record OffsetPage<T>(
+            List<T> data,
+            Integer pageNumber,
+            Integer pageSize,
+            Boolean hasNext
+    ){}
+
     // 단일 멤버 미션
     @Builder
     public record MemberMissionDTO(

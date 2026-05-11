@@ -15,6 +15,7 @@ import com.example.umc10th.domain.store.exception.StoreException;
 import com.example.umc10th.domain.store.exception.code.StoreErrorCode;
 import com.example.umc10th.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,12 @@ public class MissionService {
     private final MissionRepository missionRepository;
 
     // 미션 조회
-    public MissionResDTO.MemberMissionListDTO getMissionList(Long memberId, String statusStr, Long cursorMissionId, Integer size) {
+    public MissionResDTO.OffsetPage<MissionResDTO.MemberMissionDTO> getMissionListOffset(
+            Long memberId,
+            String statusStr,
+            Integer PageNumber,
+            Integer pageSize
+    ) {
         // 상태 필터
         Status status = switch (statusStr) {
             case "ONGOING" -> Status.NONE;
@@ -41,26 +47,20 @@ public class MissionService {
             default -> throw new MissionException(MissionErrorCode.INVALID_STATUS);
         };
 
-        int requestSize = size;
-        List<MemberMission> entities = memberMissionRepository.findMissions(
-                memberId,
-                status,
-                cursorMissionId, PageRequest.of(0, requestSize + 1));
+        PageRequest pageRequest = PageRequest.of(PageNumber, pageSize);
 
-        boolean hasNext = entities.size() > requestSize;
+        Page<MemberMission> page = memberMissionRepository.findByMember_IdAndStatusOrderByIdDesc(memberId, status, pageRequest);
 
-        List<MemberMission> page = hasNext ? entities.subList(0, requestSize) : entities;
-
-        List<MissionResDTO.MemberMissionDTO> missions = page.stream()
+        List<MissionResDTO.MemberMissionDTO> missions = page.getContent().stream()
                 .map(MissionConverter::toMemberMissionDTO)
                 .toList();
 
-        Long nextCursor = null;
-        if (hasNext && !page.isEmpty()) {
-            nextCursor = page.get(page.size() - 1).getId();
-        }
-
-        return MissionConverter.toMemberMissionListDTO(missions, hasNext, nextCursor);
+        return MissionResDTO.OffsetPage.<MissionResDTO.MemberMissionDTO>builder()
+                .data(missions)
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .hasNext(page.hasNext())
+                .build();
     }
 
     // 미션 성공 요청
