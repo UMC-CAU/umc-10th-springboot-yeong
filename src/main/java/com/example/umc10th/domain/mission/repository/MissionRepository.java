@@ -4,6 +4,7 @@ import com.example.umc10th.domain.mission.entity.Mission;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,7 +36,9 @@ public interface MissionRepository extends JpaRepository<Mission,Long> {
             Pageable pageable
     );
 
+    @EntityGraph(attributePaths = {"store"})
     Slice<Mission> findMissionsByStore_IdAndIdLessThanOrderByIdDesc(Long storeId, long idCursor, PageRequest pageRequest);
 
+    @EntityGraph(attributePaths = {"store"})
     Slice<Mission> findMissionsByStore_IdOrderByIdDesc(Long storeId, PageRequest pageRequest);
 }
