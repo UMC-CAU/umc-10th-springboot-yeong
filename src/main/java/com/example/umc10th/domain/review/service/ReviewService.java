@@ -5,6 +5,7 @@ import com.example.umc10th.domain.member.exception.MemberException;
 import com.example.umc10th.domain.member.exception.code.MemberErrorCode;
 import com.example.umc10th.domain.member.repository.MemberRepository;
 import com.example.umc10th.domain.review.converter.ReviewConverter;
+import com.example.umc10th.domain.review.dto.ReviewCursor;
 import com.example.umc10th.domain.review.dto.ReviewReqDTO;
 import com.example.umc10th.domain.review.dto.ReviewResDTO;
 import com.example.umc10th.domain.review.entity.Review;
@@ -15,6 +16,7 @@ import com.example.umc10th.domain.store.entity.Store;
 import com.example.umc10th.domain.store.exception.StoreException;
 import com.example.umc10th.domain.store.exception.code.StoreErrorCode;
 import com.example.umc10th.domain.store.repository.StoreRepository;
+import com.example.umc10th.global.util.CursorCodec;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -67,15 +69,14 @@ public class ReviewService {
 
         // 커서가 있는 경우
         if (!cursor.equals("-1")){
+            ReviewCursor decoded = CursorCodec.decode(cursor);
 
-            // 커서 분리
-            String[] cursorSplit = cursor.split("\\|");
-            switch (query.toLowerCase()) {
+            switch (decoded.query().toLowerCase()) {
                 case "createdat" -> {
 
                     // 커서 타입 변환
-                    LocalDateTime cursorCreatedAt = LocalDateTime.parse(cursorSplit[0]);
-                    Long cursorReviewId = Long.parseLong(cursorSplit[1]);
+                    LocalDateTime cursorCreatedAt = decoded.createdAt();
+                    Long cursorReviewId = decoded.id();
 
                     // 가게 내 리뷰들 조회 & where절에 커서값 기입
                     reviews = reviewRepository.findByStoreIdWithCursor(
@@ -93,7 +94,14 @@ public class ReviewService {
         }
 
         // 다음 커서 계산
-        nextCursor = reviews.getContent().getLast().getCreatedAt() + "|" + reviews.getContent().getLast().getId();
+        if (!reviews.hasNext()) {
+            nextCursor = "-1";
+        } else {
+            Review last = reviews.getContent().getLast();
+            nextCursor = CursorCodec.encode(
+                    new ReviewCursor(query, last.getCreatedAt(), last.getId())
+            );
+        }
 
         // 리뷰들 응답 DTO로 포장하기
         return ReviewConverter.toPagination(
