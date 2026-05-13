@@ -137,7 +137,7 @@ public class MissionService {
                             pageRequest
                     );
                 }
-                default -> throw new MissionException(MissionErrorCode.QUERY_NOT_VALID);
+                default -> throw new MissionException(MissionErrorCode.QUERY_INVALID);
             }
         } else {
             // 커서 없이 조회
