@@ -112,6 +112,8 @@ public class SeedConfig {
             memberMissionRepository.save(MemberMission.builder()
                     .member(member).mission(m1).status(Status.NONE).build());
             memberMissionRepository.save(MemberMission.builder()
+                    .member(member).mission(m5).status(Status.NONE).build());
+            memberMissionRepository.save(MemberMission.builder()
                     .member(member).mission(m2).status(Status.SUCCESS).build());
             memberMissionRepository.save(MemberMission.builder()
                     .member(member).mission(m3).status(Status.SUCCESS).build());
