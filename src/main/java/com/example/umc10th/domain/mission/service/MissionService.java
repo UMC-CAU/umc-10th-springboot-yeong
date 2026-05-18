@@ -88,7 +88,7 @@ public class MissionService {
 
     // 가게 미션 생성
     @Transactional
-    public Void createMission(
+    public Long createMission(
             Long storeId,
             MissionReqDTO.CreateMission dto
     ) {
@@ -101,7 +101,7 @@ public class MissionService {
 
         // 미션 DB 저장
         missionRepository.save(mission);
-        return null;
+        return mission.getId();
     }
 
     // 가게 내 미션들 조회
