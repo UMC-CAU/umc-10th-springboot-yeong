@@ -52,4 +52,8 @@ public class MemberMission {
         this.review = review;
     }
 
+    public void confirmSuccess() {
+        this.status = Status.SUCCESS;
+        this.completed_at = LocalDate.now();
+    }
 }

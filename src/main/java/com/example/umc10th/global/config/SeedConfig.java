@@ -9,6 +9,8 @@ import com.example.umc10th.domain.mission.entity.Mission;
 import com.example.umc10th.domain.mission.enums.Status;
 import com.example.umc10th.domain.mission.repository.MemberMissionRepository;
 import com.example.umc10th.domain.mission.repository.MissionRepository;
+import com.example.umc10th.domain.review.entity.Review;
+import com.example.umc10th.domain.review.repository.ReviewRepository;
 import com.example.umc10th.domain.store.entity.Region;
 import com.example.umc10th.domain.store.entity.Store;
 import com.example.umc10th.domain.store.repository.RegionRepository;
@@ -30,6 +32,7 @@ public class SeedConfig {
     private final MissionRepository missionRepository;
     private final MemberRepository memberRepository;
     private final MemberMissionRepository memberMissionRepository;
+    private final ReviewRepository reviewRepository;
 
     @Bean
     @Transactional
@@ -85,7 +88,7 @@ public class SeedConfig {
                     .store(store)
                     .build());
 
-            // 4) Member
+            // Member
             Member member = memberRepository.save(Member.builder()
                     .password("pw")
                     .name("더미유저")
@@ -99,9 +102,17 @@ public class SeedConfig {
                     .point(5000)
                     .build());
 
+            // Review
+            Review review1 = reviewRepository.save(Review.builder().score(1).content("맛있어요").store(store).member(member).build());
+            Review review2 = reviewRepository.save(Review.builder().score(2).content("맛있어요").store(store).member(member).build());
+            Review review3 = reviewRepository.save(Review.builder().score(3).content("맛있어요").store(store).member(member).build());
+            Review review4 = reviewRepository.save(Review.builder().score(4).content("맛있어요").store(store).member(member).build());
+
             // MemberMission
             memberMissionRepository.save(MemberMission.builder()
                     .member(member).mission(m1).status(Status.NONE).build());
+            memberMissionRepository.save(MemberMission.builder()
+                    .member(member).mission(m5).status(Status.NONE).build());
             memberMissionRepository.save(MemberMission.builder()
                     .member(member).mission(m2).status(Status.SUCCESS).build());
             memberMissionRepository.save(MemberMission.builder()
