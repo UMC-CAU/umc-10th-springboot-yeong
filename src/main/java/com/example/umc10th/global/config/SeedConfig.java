@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
@@ -33,6 +34,7 @@ public class SeedConfig {
     private final MemberRepository memberRepository;
     private final MemberMissionRepository memberMissionRepository;
     private final ReviewRepository reviewRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     @Transactional
@@ -90,7 +92,7 @@ public class SeedConfig {
 
             // Member
             Member member = memberRepository.save(Member.builder()
-                    .password("pw")
+                    .password(passwordEncoder.encode("pw"))
                     .name("더미유저")
                     .gender(Gender.MALE)
                     .birth(LocalDate.of(2000, 1, 1))

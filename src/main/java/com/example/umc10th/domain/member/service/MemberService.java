@@ -4,6 +4,7 @@ import com.example.umc10th.domain.member.converter.MemberConverter;
 import com.example.umc10th.domain.member.dto.MemberReqDTO;
 import com.example.umc10th.domain.member.dto.MemberResDTO;
 import com.example.umc10th.domain.member.entity.Member;
+import com.example.umc10th.domain.member.enums.Provider;
 import com.example.umc10th.domain.member.exception.MemberException;
 import com.example.umc10th.domain.member.exception.code.MemberErrorCode;
 import com.example.umc10th.domain.member.repository.MemberRepository;
@@ -20,6 +21,7 @@ import com.example.umc10th.domain.store.repository.RegionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,6 +36,7 @@ public class MemberService {
     private final RegionRepository regionRepository;
     private final MissionRepository missionRepository;
     private final MemberMissionRepository memberMissionRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 홈 화면
     public MemberResDTO.HomeDTO getHome(Long memberId, Long regionId, LocalDate cursorEndDate, Long cursorMissionId, Integer size) {
@@ -83,7 +86,23 @@ public class MemberService {
 
     // 회원가입
     public MemberResDTO.SignUpDTO signUp(MemberReqDTO.SignUp signUp) {
-        return MemberConverter.toSignUpDTO(1L);
+
+        Member member= Member.builder()
+                .password(passwordEncoder.encode(signUp.password()))
+                .name(signUp.name())
+                .gender(signUp.gender())
+                .birth(signUp.birth())
+                .address(signUp.address())
+                .email(signUp.email())
+                .phone(signUp.phone())
+                .socialProvider(Provider.LOCAL)
+                .socialId("LOCAL")
+                .point(0)
+                .build();
+
+        memberRepository.save(member);
+
+        return MemberConverter.toSignUpDTO(member.getId());
     }
 
     // 마이페이지
