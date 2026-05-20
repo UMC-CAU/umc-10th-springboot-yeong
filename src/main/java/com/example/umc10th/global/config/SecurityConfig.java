@@ -1,7 +1,9 @@
 package com.example.umc10th.global.config;
 
+import com.example.umc10th.global.apiPayload.code.GeneralSuccessCode;
 import com.example.umc10th.global.security.exception.CustomAccessDenied;
 import com.example.umc10th.global.security.exception.CustomEntryPoint;
+import com.example.umc10th.global.util.SecurityResponseUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,7 +36,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .defaultSuccessUrl("/swagger-ui/index.html", true)
+                        .successHandler((request, response, authentication) -> {
+                            SecurityResponseUtil.writeSuccess(response, GeneralSuccessCode.LOGIN);
+                        })
                         .permitAll()
                 )
                 .logout(logout -> logout

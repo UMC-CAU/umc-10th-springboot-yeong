@@ -2,6 +2,7 @@ package com.example.umc10th.global.util;
 
 import com.example.umc10th.global.apiPayload.ApiResponse;
 import com.example.umc10th.global.apiPayload.code.BaseErrorCode;
+import com.example.umc10th.global.apiPayload.code.BaseSuccessCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -19,5 +20,13 @@ public final class SecurityResponseUtil {
 
         ApiResponse<Void> errorResponse = ApiResponse.onFailure(code, null);
         objectMapper.writeValue(response.getOutputStream(), errorResponse);
+    }
+
+    public static void writeSuccess(HttpServletResponse response, BaseSuccessCode code) throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(code.getStatus().value());
+
+        ApiResponse<Void> successResponse = ApiResponse.onSuccess(code, null);
+        objectMapper.writeValue(response.getOutputStream(), successResponse);
     }
 }
