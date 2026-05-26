@@ -109,18 +109,9 @@ public class MemberService {
     }
 
     // 마이페이지
-    public MemberResDTO.MyPageDTO getMyPage(Long memberId) {
+    public MemberResDTO.MyPageDTO getMyPage(AuthMember member) {
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
-
-        return MemberConverter.toMyPageDTO(
-                member.getId(),
-                member.getName(),
-                member.getEmail(),
-                member.getPhone(),
-                member.getPoint()
-        );
+        return MemberConverter.toMyPageDTO(member.getMember());
     }
 
     // 로그인
