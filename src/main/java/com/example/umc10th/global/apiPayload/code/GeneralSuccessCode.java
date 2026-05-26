@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum GeneralSuccessCode implements BaseSuccessCode {
 
     OK(HttpStatus.OK, "COMMON200_1", "성공적으로 요청을 처리햇습니다."),
+    LOGIN(HttpStatus.OK, "COMMON200_2", "성공적으로 로그인하였습니다"),
     ;
 
     private final HttpStatus status;
