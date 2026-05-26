@@ -42,4 +42,10 @@ public class MemberResDTO {
             String phone,
             Integer points
     ){}
+
+    // 로그인
+    @Builder
+    public record LoginDTO(
+            String accessToken
+    ){}
 }

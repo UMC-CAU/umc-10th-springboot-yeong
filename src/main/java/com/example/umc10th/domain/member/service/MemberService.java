@@ -18,6 +18,8 @@ import com.example.umc10th.domain.store.entity.Region;
 import com.example.umc10th.domain.store.exception.StoreException;
 import com.example.umc10th.domain.store.exception.code.StoreErrorCode;
 import com.example.umc10th.domain.store.repository.RegionRepository;
+import com.example.umc10th.global.security.entity.AuthMember;
+import com.example.umc10th.global.security.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +39,7 @@ public class MemberService {
     private final MissionRepository missionRepository;
     private final MemberMissionRepository memberMissionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     // 홈 화면
     public MemberResDTO.HomeDTO getHome(Long memberId, Long regionId, LocalDate cursorEndDate, Long cursorMissionId, Integer size) {
@@ -118,6 +121,25 @@ public class MemberService {
                 member.getPhone(),
                 member.getPoint()
         );
+    }
+
+    // 로그인
+    public MemberResDTO.LoginDTO login(MemberReqDTO.Login login) {
+
+        Member member = memberRepository.findByEmail(login.email())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(login.password(), member.getPassword())) {
+            throw new MemberException(MemberErrorCode.MEMBER_INVALID_PASSWORD);
+        }
+
+        AuthMember authMember = new AuthMember(member);
+
+        String token = jwtUtil.createAccessToken(authMember);
+
+        return MemberResDTO.LoginDTO.builder()
+                .accessToken(token)
+                .build();
     }
 
 }

@@ -32,7 +32,6 @@ public class SecurityConfig {
 
             // 로그인
             "/auth/**",
-            "/login"
     };
 
     @Bean
