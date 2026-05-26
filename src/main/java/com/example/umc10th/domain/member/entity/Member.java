@@ -38,11 +38,11 @@ public class Member extends BaseEntity {
 
     // 성별
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private Gender gender;
 
     // 생년월일
-    @Column(nullable = false)
+    @Column
     private LocalDate birth;
 
     // 주소
@@ -54,17 +54,17 @@ public class Member extends BaseEntity {
     private String email;
 
     // 전화번호
-    @Column(nullable = false, length = 13)
+    @Column(length = 13)
     private String phone;
 
     // 소셜 로그인 제공자
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Provider socialProvider;
+    private Provider socialType;
 
     // 소셜 로그인 ID
     @Column(nullable = false)
-    private String socialId;
+    private String socialUid;
 
     // 포인트
     @Column(nullable = false)

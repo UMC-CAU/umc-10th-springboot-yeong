@@ -1,5 +1,6 @@
 package com.example.umc10th.global.security.filter;
 
+import com.example.umc10th.domain.member.enums.Provider;
 import com.example.umc10th.global.apiPayload.ApiResponse;
 import com.example.umc10th.global.apiPayload.code.BaseErrorCode;
 import com.example.umc10th.global.apiPayload.code.GeneralErrorCode;
@@ -45,10 +46,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             token = token.replace("Bearer ", "");
             // AccessToken 검증하기: 올바른 토큰이면
             if (jwtUtil.isValid(token)) {
-                // 토큰에서 이메일 추출
-                String email = jwtUtil.getEmail(token);
+                // JWT 토큰에서 유저 정보 조회: UID와 소셜 로그인 타입 가져오기
+                String uid= jwtUtil.getUid(token);
+                Provider socialType = jwtUtil.getSocialType(token);
+
                 // 인증 객체 생성: 이메일로 찾아온 뒤, 인증 객체 생성
-                UserDetails user = customUserDetailsService.loadUserByUsername(email);
+                UserDetails user = customUserDetailsService.loadUserByUidAndSocialType(socialType, uid);
                 Authentication auth = new UsernamePasswordAuthenticationToken(
                         user,
                         null,

@@ -2,7 +2,9 @@ package com.example.umc10th.domain.member.converter;
 
 import com.example.umc10th.domain.member.dto.MemberResDTO;
 import com.example.umc10th.domain.member.entity.Member;
+import com.example.umc10th.domain.member.enums.Provider;
 import com.example.umc10th.domain.mission.dto.MissionResDTO;
+import com.example.umc10th.global.security.dto.OAuthDTO;
 
 import java.util.List;
 
@@ -49,5 +51,25 @@ public class MemberConverter {
                 .points(member.getPoint())
                 .build();
 
+    }
+
+    // 로그인 (토큰 응답용)
+    public static MemberResDTO.LoginDTO toLoginDTO(String accessToken) {
+        return MemberResDTO.LoginDTO.builder()
+                .accessToken(accessToken)
+                .build();
+    }
+
+    // 소셜 로그인 회원가입용 엔티티 변환
+    public static Member toMember(OAuthDTO dto) {
+        return Member.builder()
+                .name(dto.getName())
+                .email(dto.getSocialEmail())
+                .socialUid(dto.getSocialUid())
+                .socialType(Provider.KAKAO)
+                .point(0)
+                .password("")
+                .address("주소 미입력")
+                .build();
     }
 }

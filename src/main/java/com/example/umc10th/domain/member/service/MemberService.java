@@ -98,8 +98,8 @@ public class MemberService {
                 .address(signUp.address())
                 .email(signUp.email())
                 .phone(signUp.phone())
-                .socialProvider(Provider.LOCAL)
-                .socialId("LOCAL")
+                .socialType(Provider.LOCAL)
+                .socialUid("LOCAL")
                 .point(0)
                 .build();
 
@@ -128,9 +128,7 @@ public class MemberService {
 
         String token = jwtUtil.createAccessToken(authMember);
 
-        return MemberResDTO.LoginDTO.builder()
-                .accessToken(token)
-                .build();
+        return MemberConverter.toLoginDTO(token);
     }
 
 }
