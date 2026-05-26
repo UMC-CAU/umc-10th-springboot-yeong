@@ -1,4 +1,4 @@
-package com.example.umc10th.global.config;
+    package com.example.umc10th.global.config;
 
 import com.example.umc10th.global.apiPayload.code.GeneralSuccessCode;
 import com.example.umc10th.global.security.exception.CustomAccessDenied;
@@ -24,7 +24,8 @@ public class SecurityConfig {
             "/v3/api-docs/**",
 
             // 로그인
-            "/auth/**"
+            "/auth/**",
+            "/login"
     };
 
     @Bean
