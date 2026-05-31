@@ -38,4 +38,12 @@ public class MemberReqDTO {
             Boolean locationAgree,
             Boolean marketingAgree
     ){}
+
+    // 로그인
+    public record Login(
+            @NotBlank(message = "이메일은 필수 입니다")
+            String email,
+            @NotBlank(message = "비밀번호는 필수 입니다")
+            String password
+    ){}
 }

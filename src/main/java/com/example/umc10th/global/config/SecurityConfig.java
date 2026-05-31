@@ -1,9 +1,13 @@
-    package com.example.umc10th.global.config;
+package com.example.umc10th.global.config;
 
-import com.example.umc10th.global.apiPayload.code.GeneralSuccessCode;
 import com.example.umc10th.global.security.exception.CustomAccessDenied;
 import com.example.umc10th.global.security.exception.CustomEntryPoint;
-import com.example.umc10th.global.util.SecurityResponseUtil;
+import com.example.umc10th.global.security.filter.JwtAuthFilter;
+import com.example.umc10th.global.security.handler.OAuthSuccessHandler;
+import com.example.umc10th.global.security.service.CustomOAuthService;
+import com.example.umc10th.global.security.service.CustomUserDetailsService;
+import com.example.umc10th.global.security.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,10 +16,16 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtUtil jwtUtil;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final CustomOAuthService customOAuthService;
 
     private final String[] allowUris = {
             // Swagger 허용
@@ -25,23 +35,43 @@ public class SecurityConfig {
 
             // 로그인
             "/auth/**",
-            "/login"
+            "/login/**"
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                // URI 허용 여부
                 .authorizeHttpRequests(requests -> requests
+                        // Public API 허용
                         .requestMatchers(allowUris).permitAll()
+                        // 그 이외 APi는 인증 필요
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .successHandler((request, response, authentication) -> {
-                            SecurityResponseUtil.writeSuccess(response, GeneralSuccessCode.LOGIN);
-                        })
-                        .permitAll()
+                // 폼 로그인
+                .formLogin(AbstractHttpConfigurer::disable)
+                // OAuth
+                .oauth2Login(oauth -> oauth
+                        // 인증 엔트리 포인트
+                        .authorizationEndpoint(auth -> auth
+                                .baseUri("/oauth/authorize")
+                        )
+                        // 콜백 주소
+                        .redirectionEndpoint(redirect -> redirect
+                                .baseUri("/oauth/callback/**")
+                        )
+                        // 인증 완료 후 정보 활용
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuthService)
+                        )
+                        // 성공 시 JWT 토큰 발행할 핸들러
+                        .successHandler(oAuthSuccessHandler())
                 )
+                // 세션
+                .sessionManagement(AbstractHttpConfigurer::disable)
+                // JWT 필터
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
@@ -69,4 +99,15 @@ public class SecurityConfig {
     public CustomEntryPoint customEntryPoint() {
         return new CustomEntryPoint();
     }
+
+    @Bean
+    public JwtAuthFilter jwtAuthFilter() {
+        return new JwtAuthFilter(jwtUtil, customUserDetailsService);
+    }
+
+    @Bean
+    public OAuthSuccessHandler oAuthSuccessHandler() {
+        return new OAuthSuccessHandler(jwtUtil);
+    }
+
 }

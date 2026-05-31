@@ -5,9 +5,10 @@ import com.example.umc10th.domain.member.dto.MemberResDTO;
 import com.example.umc10th.domain.member.exception.code.MemberSuccessCode;
 import com.example.umc10th.domain.member.service.MemberService;
 import com.example.umc10th.global.apiPayload.ApiResponse;
+import com.example.umc10th.global.security.entity.AuthMember;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -40,14 +41,14 @@ public class MemberController {
     // 마이페이지
     @GetMapping("/api/v1/mypage")
     public ApiResponse<MemberResDTO.MyPageDTO> myPage(
-            @RequestParam Long memberId
+            @AuthenticationPrincipal AuthMember member
     ) {
-        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_MYPAGE_SUCCESS, memberService.getMyPage(memberId));
+        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_MYPAGE_SUCCESS, memberService.getMyPage(member));
     }
 
     // 로그인
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public void login(@RequestParam String username, @RequestParam String password) {
-        // 스프링 시큐리티의 필터가 먼저 요청을 가로채서 처리하므로, 임시 로그인 생성
+    @PostMapping("/auth/v1/login")
+    public ApiResponse<MemberResDTO.LoginDTO> login(@RequestBody @Valid MemberReqDTO.Login login) {
+        return ApiResponse.onSuccess(MemberSuccessCode.MEMBER_LOGIN_SUCCESS, memberService.login(login));
     }
 }

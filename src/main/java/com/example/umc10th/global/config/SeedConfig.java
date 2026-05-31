@@ -99,8 +99,8 @@ public class SeedConfig {
                     .address("서울")
                     .email("dummy@test.com")
                     .phone("010-0000-0000")
-                    .socialProvider(Provider.LOCAL)
-                    .socialId("dummy")
+                    .socialType(Provider.LOCAL)
+                    .socialUid("dummy")
                     .point(5000)
                     .build());
 
