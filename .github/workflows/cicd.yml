@@ -2,7 +2,7 @@ name: CI/CD Pipeline (.jar)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "7-feature-10" ]
 
 jobs:
   build:
