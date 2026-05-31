@@ -1,5 +1,6 @@
 package com.example.umc10th.domain.member.controller;
 
+import com.example.umc10th.domain.member.controller.docs.MemberControllerDocs;
 import com.example.umc10th.domain.member.dto.MemberReqDTO;
 import com.example.umc10th.domain.member.dto.MemberResDTO;
 import com.example.umc10th.domain.member.exception.code.MemberSuccessCode;
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
-public class MemberController {
+public class MemberController implements MemberControllerDocs {
 
     private final MemberService memberService;
 
