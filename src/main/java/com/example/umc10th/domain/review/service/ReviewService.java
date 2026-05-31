@@ -70,8 +70,9 @@ public class ReviewService {
         // 커서가 있는 경우
         if (!cursor.equals("-1")){
             ReviewCursor decoded = CursorCodec.decode(cursor);
+            query = decoded.query();
 
-            switch (decoded.query().toLowerCase()) {
+            switch (query.toLowerCase()) {
                 case "createdat" -> {
 
                     // 커서 타입 변환
@@ -90,7 +91,12 @@ public class ReviewService {
             }
         } else {
             // 커서 없이 조회
-            reviews = reviewRepository.findReviewsByStore_IdOrderByCreatedAtDescIdDesc(storeId, pageRequest);
+            switch (query.toLowerCase()) {
+                case "createdat" -> {
+                    reviews = reviewRepository.findReviewsByStore_IdOrderByCreatedAtDescIdDesc(storeId, pageRequest);
+                }
+                default -> throw new ReviewException(ReviewErrorCode.QUERY_INVALID);
+            }
         }
 
         // 다음 커서 계산
