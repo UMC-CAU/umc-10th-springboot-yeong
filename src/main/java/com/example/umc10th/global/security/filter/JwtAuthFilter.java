@@ -7,6 +7,7 @@ import com.example.umc10th.global.apiPayload.code.GeneralErrorCode;
 import com.example.umc10th.global.security.service.CustomUserDetailsService;
 import com.example.umc10th.global.security.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,7 +48,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // AccessToken 검증하기: 올바른 토큰이면
             if (jwtUtil.isValid(token)) {
                 // JWT 토큰에서 유저 정보 조회: UID와 소셜 로그인 타입 가져오기
-                String uid= jwtUtil.getUid(token);
+                String uid = jwtUtil.getUid(token);
                 Provider socialType = jwtUtil.getSocialType(token);
 
                 // 인증 객체 생성: 이메일로 찾아온 뒤, 인증 객체 생성
@@ -61,9 +62,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
+        } catch (JwtException e) {
             ObjectMapper mapper = new ObjectMapper();
             BaseErrorCode code = GeneralErrorCode.UNAUTHORIZED;
+
+            response.setContentType("application/json;charset=UTF-8");
+            response.setStatus(code.getStatus().value());
+
+            ApiResponse<Void> errorResponse = ApiResponse.onFailure(code,null);
+
+            mapper.writeValue(response.getOutputStream(), errorResponse);
+        } catch (Exception e) {
+            ObjectMapper mapper = new ObjectMapper();
+            BaseErrorCode code = GeneralErrorCode.INTERNAL_SERVER_ERROR;
 
             response.setContentType("application/json;charset=UTF-8");
             response.setStatus(code.getStatus().value());
